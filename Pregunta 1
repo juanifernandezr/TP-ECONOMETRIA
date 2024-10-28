@@ -1,0 +1,262 @@
+rm(list = ls())
+library(eph)
+library (AER)
+library(ggplot2)
+help(package = "eph")
+EPH23 <- get_microdata (year = 2023, period = 1, type = "individual")       
+EPH24 <- get_microdata (year = 2024, period = 1, type = "individual")       
+EPH23 <- organize_labels (EPH23, type = "individual")
+EPH24 <- organize_labels (EPH24, type = "individual")                        
+base23 <- EPH23 [, c( "P21", "PONDIIO", "CH06", "AGLOMERADO", "CH04", "NIVEL_ED", "CAT_OCUP", "CH03", "CH07", "CH12", "CH13", "CH14")] 
+base24 <- EPH24 [, c("P21", "PONDIIO", "CH06", "AGLOMERADO", "CH04", "NIVEL_ED", "CAT_OCUP", "CH03", "CH07", "CH12", "CH13", "CH14")] 
+ 
+colnames(base23)[colnames(base23) == "CH12"] <- "nivel" 
+colnames(base23)[colnames(base23) == "CH13"] <- "finalizo"
+colnames(base23)[colnames(base23) == "CH14"] <- "ultimo_anio"   
+colnames(base23)[colnames(base23) == "CH07"] <- "estado civil"   
+colnames(base23)[colnames(base23) == "P21"] <- "salario"   
+colnames(base23)[colnames(base23) == "CH03"] <- "parentesco"   
+colnames(base23)[colnames(base23) == "PONDIIO"] <- "pondiio"   
+colnames(base23)[colnames(base23) == "CH06"] <- "edad"
+colnames(base23)[colnames(base23) == "AGLOMERADO"] <- "aglomerado"
+colnames(base23)[colnames(base23) == "CH04"] <- "genero"
+colnames(base23)[colnames(base23) == "NIVEL_ED"] <- "educacion"
+colnames(base23)[colnames(base23) == "CAT_OCUP"] <- "ocupacion"
+colnames(base24)[colnames(base24) == "CH12"] <- "nivel" 
+colnames(base24)[colnames(base24) == "CH13"] <- "finalizo"
+colnames(base24)[colnames(base24) == "CH14"] <- "ultimo_anio"  
+colnames(base24)[colnames(base24) == "CH07"] <- "estado civil"   
+colnames(base24)[colnames(base24) == "P21"] <- "salario"   
+colnames(base24)[colnames(base24) == "CH03"] <- "parentesco"   
+colnames(base24)[colnames(base24) == "PONDIIO"] <- "pondiio"   
+colnames(base24)[colnames(base24) == "CH06"] <- "edad"
+colnames(base24)[colnames(base24) == "AGLOMERADO"] <- "aglomerado"
+colnames(base24)[colnames(base24) == "CH04"] <- "genero"
+colnames(base24)[colnames(base24) == "NIVEL_ED"] <- "educacion"
+colnames(base24)[colnames(base24) == "CAT_OCUP"] <- "ocupacion"
+ 
+base23 <- base23[base23$aglomerado == 32 & base23$edad >= 25 & base23$edad <= 65 & base23$salario > 1 & base23$ocupacion == 3 & base23$parentesco == 1, ]
+base24 <- base24[base24$aglomerado == 32 & base24$edad >= 25 & base24$edad <= 65 & base24$salario > 1 & base24$ocupacion == 3 & base24$parentesco == 1, ]
+ 
+ 
+##PUNTO 1##
+ 
+##Salario promedio general y por genero
+salario_promedio23 <- (sum(base23$salario/ 1000 * base23$pondiio) / sum(base23$pondiio)) * 1000
+salario_promedio23h <- (sum(base23$salario[base23$genero == 1] / 1000 * base23$pondiio[base23$genero == 1]) / sum(base23$pondiio[base23$genero == 1])) * 1000
+salario_promedio23m <- (sum(base23$salario[base23$genero == 2] / 1000 * base23$pondiio[base23$genero == 2]) / sum(base23$pondiio[base23$genero == 2])) * 1000
+salario_promedio24 <- (sum(base24$salario/ 1000 * base24$pondiio) / sum(base24$pondiio)) * 1000
+salario_promedio24h <- (sum(base24$salario[base24$genero == 1] / 1000 * base24$pondiio[base24$genero == 1]) / sum(base24$pondiio[base24$genero == 1])) * 1000
+salario_promedio24m <- (sum(base24$salario[base24$genero == 2] / 1000 * base24$pondiio[base24$genero == 2]) / sum(base24$pondiio[base24$genero == 2])) * 1000
+ 
+#Salario promedio por intervalo de edad
+salario_promedio23_2534 <- (sum(base23$salario[base23$edad >= 25 & base23$edad<=34] / 1000 * base23$pondiio[base23$edad >= 25 & base23$edad<=34]) / sum(base23$pondiio[base23$edad >= 25 & base23$edad<=34])) * 1000     
+salario_promedio23_3544 <- (sum(base23$salario[base23$edad >= 35 & base23$edad<=44] / 1000 * base23$pondiio[base23$edad >= 35 & base23$edad<=44]) / sum(base23$pondiio[base23$edad >= 35 & base23$edad<=44])) * 1000     
+salario_promedio23_4554 <- (sum(base23$salario[base23$edad >= 45 & base23$edad<=54] / 1000 * base23$pondiio[base23$edad >= 45 & base23$edad<=54]) / sum(base23$pondiio[base23$edad >= 45 & base23$edad<=54])) * 1000     
+salario_promedio23_5565 <- (sum(base23$salario[base23$edad >= 55 & base23$edad<=65] / 1000 * base23$pondiio[base23$edad >= 55 & base23$edad<=65]) / sum(base23$pondiio[base23$edad >= 55 & base23$edad<=65])) * 1000     
+salario_promedio24_2534 <- (sum(base24$salario[base24$edad >= 25 & base24$edad<=34] / 1000 * base24$pondiio[base24$edad >= 25 & base24$edad<=34]) / sum(base24$pondiio[base24$edad >= 25 & base24$edad <= 34])) * 1000     
+salario_promedio24_3544 <- (sum(base24$salario[base24$edad >= 35 & base24$edad<=44] / 1000 * base24$pondiio[base24$edad >= 35 & base24$edad<=44]) / sum(base24$pondiio[base24$edad >= 35 & base24$edad <= 44])) * 1000     
+salario_promedio24_4554 <- (sum(base24$salario[base24$edad >= 45 & base24$edad<=54] / 1000 * base24$pondiio[base24$edad >= 45 & base24$edad<=54]) / sum(base24$pondiio[base24$edad >= 45 & base24$edad <= 54])) * 1000     
+salario_promedio24_5565 <- (sum(base24$salario[base24$edad >= 55 & base24$edad<=65] / 1000 * base24$pondiio[base24$edad >= 55 & base24$edad<=65]) / sum(base24$pondiio[base24$edad >= 55 & base24$edad <= 65])) * 1000     
+rbind (salario_promedio23, salario_promedio23h, salario_promedio23m, salario_promedio23_2534, salario_promedio23_3544, salario_promedio23_4554, salario_promedio23_5565, salario_promedio24, salario_promedio24h, salario_promedio23m, salario_promedio24_2534, salario_promedio24_3544, salario_promedio24_4554, salario_promedio24_5565)
+ 
+#Comparacion 
+salario_promedio23_ajustado <- salario_promedio23 * 3.8750
+salario_promedio23h_ajustado <- salario_promedio23h * 3.8750
+salario_promedio23m_ajustado <- salario_promedio23m * 3.8750
+salario_promedio23_2534ajustado <- salario_promedio23_2534 * 3.8750
+salario_promedio23_ajustado3544 <- salario_promedio23_3544 * 3.8750
+salario_promedio23_ajustado4554 <- salario_promedio23_4554 * 3.8750
+salario_promedio23_ajustado5565 <- salario_promedio23_5565 * 3.8750
+rbind (salario_promedio23_ajustado, salario_promedio24, salario_promedio23h_ajustado, salario_promedio24h , salario_promedio23m_ajustado, salario_promedio24m, salario_promedio23_2534ajustado, salario_promedio24_2534, salario_promedio23_ajustado3544, salario_promedio24_3544 , salario_promedio23_ajustado4554, salario_promedio24_4554 , salario_promedio23_ajustado5565, salario_promedio24_5565)
+ 
+ 
+ 
+##PUNTO 2##
+ 
+##Regresion lineal, categorias base uc, soltero y mujer
+ 
+#Para 2023
+ 
+base23$varon <- ifelse (base23$genero == 1, 1, 0)
+base23$`unido` <- ifelse (base23$`estado civil` == 1, 1, 0)
+base23$`casado` <- ifelse (base23$`estado civil` == 2, 1, 0)
+base23$`separado` <- ifelse (base23$`estado civil` == 3, 1, 0)
+base23$`viudo` <- ifelse (base23$`estado civil` == 4, 1, 0)
+base23$pi <- ifelse (base23$educacion == 1 | base23$educacion == 7 , 1, 0)
+base23$pc <- ifelse (base23$educacion == 2 , 1, 0)
+base23$si <- ifelse (base23$educacion == 3 , 1, 0)
+base23$sc <- ifelse (base23$educacion == 4 , 1, 0)
+base23$ui <- ifelse (base23$educacion == 5 , 1, 0)
+reg23 <- lm (log(base23$salario) ~ base23$edad + base23$varon + base23$unido + base23$casado + base23$separado + base23$viudo + base23$ui + base23$sc + base23$si + base23$pi + base23$pc)
+summary (reg23)
+ 
+#Para 2024
+ 
+base24$varon <- ifelse (base24$genero == 1, 1, 0)
+base24$`unido` <- ifelse (base24$`estado civil` == 1, 1, 0)
+base24$`casado` <- ifelse (base24$`estado civil` == 2, 1, 0)
+base24$`separado` <- ifelse (base24$`estado civil` == 3, 1, 0)
+base24$`viudo` <- ifelse (base24$`estado civil` == 4, 1, 0)
+base24$pi <- ifelse (base24$educacion == 1 | base24$educacion == 7 , 1, 0)
+base24$pc <- ifelse (base24$educacion == 2 , 1, 0)
+base24$si <- ifelse (base24$educacion == 3 , 1, 0)
+base24$sc <- ifelse (base24$educacion == 4 , 1, 0)
+base24$ui <- ifelse (base24$educacion == 5 , 1, 0)
+reg24 <- lm (log(base24$salario) ~ base24$edad + base24$varon + base24$unido + base24$casado + base24$separado + base24$viudo + base24$ui + base24$sc + base24$si + base24$pi + base24$pc)
+summary (reg24)
+ 
+ 
+ 
+##PUNTO 3##
+ 
+ 
+#Para 2023
+ 
+base23$ultimo_anio <- as.numeric(base23$ultimo_anio)  # Asegurarse de que 'ultimo_anio' sea numérico
+base23$anios_estudio <- NA                            # Crear una columna para los años de estudio en base23
+# Función para calcular los años de estudio
+base23$anios_estudio <- with (base23,ifelse(nivel == 1, 0,                                                    # Jardín/Preescolar
+                                     ifelse(nivel == 2 & finalizo == 1, 7,                                    # Primario completo
+                                     ifelse(nivel == 2 & finalizo == 2 & ultimo_anio <= 7, ultimo_anio,       # Primario incompleto
+                                     ifelse(nivel == 3 & finalizo == 1, 9,                                    # EGB completo
+                                     ifelse(nivel == 3 & finalizo == 2 & ultimo_anio <= 9, ultimo_anio,       # EGB incompleto
+                                     ifelse(nivel == 4 & finalizo == 1, 12,                                   # Secundario completo
+                                     ifelse(nivel == 4 & finalizo == 2 & ultimo_anio <= 9, 9 + ultimo_anio,   # Secundario incompleto
+                                     ifelse(nivel == 5 & finalizo == 1, 12,                                   # Polimodal completo
+                                     ifelse(nivel == 5 & finalizo == 2 & ultimo_anio <= 9, 9 + ultimo_anio,   # Polimodal incompleto
+                                     ifelse(nivel == 6 & finalizo == 1, 15,                                   # Terciario completo
+                                     ifelse(nivel == 6 & finalizo == 2 & ultimo_anio <= 9, 12 + ultimo_anio,  # Terciario incompleto
+                                     ifelse(nivel == 7 & finalizo == 1, 17,                                   # Universitario completo
+                                     ifelse(nivel == 7 & finalizo == 2 & ultimo_anio <= 9, 12 + ultimo_anio,  # Universitario incompleto
+                                     ifelse(nivel == 8 & finalizo == 1, 20,                                   # Posgrado completo
+                                     ifelse(nivel == 8 & finalizo == 2 & ultimo_anio <= 9, 17 + ultimo_anio,  # Posgrado incompleto
+                                     ifelse(nivel == 9, NA,                                                   # Nivel 9: Educación especial
+                                     ifelse(ultimo_anio == 98, NA,                                            # Educación especial no numérica
+                                     ifelse(ultimo_anio == 99, NA,                                            # Ns/Nr se asigna como NA
+                                                             NA)))))))))))))))))))
+#Regresion, categoria base mujer
+Interaccion23hm <- I (base23$anios_estudio*base23$varon)
+reg23_hm <- lm (log (base23$salario) ~  base23$anios_estudio + Interaccion23hm)
+summary(reg23_hm)
+ 
+#Contraste estadistico
+linearHypothesis(reg23_hm, "Interaccion23hm = 0")
+ 
+ 
+#Para 2024                             
+ 
+base24$ultimo_anio <- as.numeric(base24$ultimo_anio) # Asegurarse de que 'ultimo_anio' sea numérico
+base24$anios_estudio <- NA                           # Crear una columna para los años de estudio en base24
+# Función para calcular los años de estudio
+base24$anios_estudio <- with (base24, ifelse(nivel == 1, 0,                                                    # Jardín/Preescolar
+                                      ifelse(nivel == 2 & finalizo == 1, 7,                                    # Primario completo
+                                      ifelse(nivel == 2 & finalizo == 2 & ultimo_anio <= 7, ultimo_anio,       # Primario incompleto
+                                      ifelse(nivel == 3 & finalizo == 1, 9,                                    # EGB completo
+                                      ifelse(nivel == 3 & finalizo == 2 & ultimo_anio <= 9, ultimo_anio,       # EGB incompleto
+                                      ifelse(nivel == 4 & finalizo == 1, 12,                                   # Secundario completo
+                                      ifelse(nivel == 4 & finalizo == 2 & ultimo_anio <= 9, 9 + ultimo_anio,   # Secundario incompleto
+                                      ifelse(nivel == 5 & finalizo == 1, 12,                                   # Polimodal completo
+                                      ifelse(nivel == 5 & finalizo == 2 & ultimo_anio <= 9, 9 + ultimo_anio,   # Polimodal incompleto
+                                      ifelse(nivel == 6 & finalizo == 1, 15,                                   # Terciario completo
+                                      ifelse(nivel == 6 & finalizo == 2 & ultimo_anio <= 9, 12 + ultimo_anio,  # Terciario incompleto
+                                      ifelse(nivel == 7 & finalizo == 1, 17,                                   # Universitario completo
+                                      ifelse(nivel == 7 & finalizo == 2 & ultimo_anio <= 9, 12 + ultimo_anio,  # Universitario incompleto
+                                      ifelse(nivel == 8 & finalizo == 1, 20,                                   # Posgrado completo
+                                      ifelse(nivel == 8 & finalizo == 2 & ultimo_anio <= 9, 17 + ultimo_anio,  # Posgrado incompleto
+                                      ifelse(nivel == 9, NA,                                                   # Nivel 9: Educación especial
+                                      ifelse(ultimo_anio == 98, NA,                                            # Educación especial no numérica
+                                      ifelse(ultimo_anio == 99, NA,                                            # Ns/Nr se asigna como NA
+                                                             NA)))))))))))))))))))
+#Regresion, categoria base mujer
+Interaccion24hm <- I(base24$anios_estudio * base24$varon)
+reg24_hm <- lm (log (base24$salario) ~ base24$anios_estudio + Interaccion24hm)
+summary(reg24_hm)
+ 
+#Contraste estadistico
+linearHypothesis(reg24_hm, "Interaccion24hm=0")
+ 
+ 
+##PUNTO 4##
+ 
+base23_4 <- EPH23 [, c( "P21", "PONDIIO", "CH06", "AGLOMERADO", "CH04", "NIVEL_ED", "CAT_OCUP", "CH03", "CH07", "CH12", "CH13", "CH14")] 
+base24_4 <- EPH24 [, c("P21", "PONDIIO", "CH06", "AGLOMERADO", "CH04", "NIVEL_ED", "CAT_OCUP", "CH03", "CH07", "CH12", "CH13", "CH14")] 
+ 
+colnames(base23_4)[colnames(base23_4) == "CH12"] <- "nivel" 
+colnames(base23_4)[colnames(base23_4) == "CH13"] <- "finalizo"
+colnames(base23_4)[colnames(base23_4) == "CH14"] <- "ultimo_anio"   
+colnames(base23_4)[colnames(base23_4) == "CH07"] <- "estado civil"   
+colnames(base23_4)[colnames(base23_4) == "P21"] <- "salario"   
+colnames(base23_4)[colnames(base23_4) == "CH03"] <- "parentesco"   
+colnames(base23_4)[colnames(base23_4) == "PONDIIO"] <- "pondiio"   
+colnames(base23_4)[colnames(base23_4) == "CH06"] <- "edad"
+colnames(base23_4)[colnames(base23_4) == "AGLOMERADO"] <- "aglomerado"
+colnames(base23_4)[colnames(base23_4) == "CH04"] <- "genero"
+colnames(base23_4)[colnames(base23_4) == "NIVEL_ED"] <- "educacion"
+colnames(base23_4)[colnames(base23_4) == "CAT_OCUP"] <- "ocupacion"
+colnames(base24_4)[colnames(base24_4) == "CH12"] <- "nivel" 
+colnames(base24_4)[colnames(base24_4) == "CH13"] <- "finalizo"
+colnames(base24_4)[colnames(base24_4) == "CH14"] <- "ultimo_anio"  
+colnames(base24_4)[colnames(base24_4) == "CH07"] <- "estado civil"   
+colnames(base24_4)[colnames(base24_4) == "P21"] <- "salario"   
+colnames(base24_4)[colnames(base24_4) == "CH03"] <- "parentesco"   
+colnames(base24_4)[colnames(base24_4) == "PONDIIO"] <- "pondiio"   
+colnames(base24_4)[colnames(base24_4) == "CH06"] <- "edad"
+colnames(base24_4)[colnames(base24_4) == "AGLOMERADO"] <- "aglomerado"
+colnames(base24_4)[colnames(base24_4) == "CH04"] <- "genero"
+colnames(base24_4)[colnames(base24_4) == "NIVEL_ED"] <- "educacion"
+colnames(base24_4)[colnames(base24_4) == "CAT_OCUP"] <- "ocupacion"
+ 
+base23_4 <- base23_4[base23_4$educacion == 6 & base23_4$edad >= 25 & base23_4$edad <= 65 & base23_4$salario > 1 & base23_4$ocupacion == 3 & base23_4$parentesco == 1, ]
+base24_4 <- base24_4[base24_4$educacion == 6  & base24_4$edad >= 25 & base24_4$edad <= 65 & base24_4$salario > 1 & base24_4$ocupacion == 3 & base24_4$parentesco == 1, ]
+base23_4 <- base23_4[base23_4$nivel > 6,]
+base24_4 <- base24_4[base24_4$nivel > 6,]
+ 
+ 
+#Para 2023
+base23_4$varon <- ifelse (base23_4$genero == 1, 1, 0)
+base23_4 <- base23_4[base23_4$educacion == 6 & base23_4$edad >= 25 & base23_4$edad <= 65 & base23_4$salario > 1 & base23_4$ocupacion == 3 & base23_4$parentesco == 1, ]
+reg23_4 <- lm(salario ~ edad + varon, data = base23_4)
+summary (reg23_4)
+edades <- 25:65
+pred_hombres <- predict(reg23_4, 
+                        newdata = data.frame(edad = edades, varon = 1), 
+                        interval = "confidence")
+pred_mujeres <- predict(reg23_4, 
+                        newdata = data.frame(edad = edades, varon = 0), 
+                        interval = "confidence")
+plot(edades, pred_hombres[, "fit"], type = "l", col = "red", lwd = 2, 
+     ylim = range(c(pred_hombres, pred_mujeres)), 
+     xlab = "Edad", ylab = "Salario Estimado", 
+     main = "Salario Promedio 2023")
+lines(edades, pred_mujeres[, "fit"], col = "blue", lwd = 2)
+lines(edades, pred_hombres[, "lwr"], col = "red", lty = 2)
+lines(edades, pred_hombres[, "upr"], col = "red", lty = 2)
+lines(edades, pred_mujeres[, "lwr"], col = "blue", lty = 2)
+lines(edades, pred_mujeres[, "upr"], col = "blue", lty = 2)
+legend("topleft", legend = c("Hombres", "Mujeres"), 
+       col = c("red", "blue"), lwd = 2)
+ 
+#Para 2024
+base24_4$varon <- ifelse (base24_4$genero == 1, 1, 0)
+base24_4 <- base24_4[base24_4$educacion == 6 & base24_4$edad >= 25 & base24_4$edad <= 65 & base24_4$salario > 1 & base24_4$ocupacion == 3 & base24_4$parentesco == 1, ]
+reg24_4 <- lm(salario ~ edad + varon, data = base24_4)
+summary (reg24_4)
+edades <- 25:65
+pred_hombres <- predict(reg24_4, 
+                        newdata = data.frame(edad = edades, varon = 1), 
+                        interval = "confidence")
+pred_mujeres <- predict(reg24_4, 
+                        newdata = data.frame(edad = edades, varon = 0), 
+                        interval = "confidence")
+plot(edades, pred_hombres[, "fit"], type = "l", col = "red", lwd = 2, 
+     ylim = range(c(pred_hombres, pred_mujeres)), 
+     xlab = "Edad", ylab = "Salario Estimado", 
+     main = "Salario Promedio 2024")
+lines(edades, pred_mujeres[, "fit"], col = "blue", lwd = 2)
+lines(edades, pred_hombres[, "lwr"], col = "red", lty = 2)
+lines(edades, pred_hombres[, "upr"], col = "red", lty = 2)
+lines(edades, pred_mujeres[, "lwr"], col = "blue", lty = 2)
+lines(edades, pred_mujeres[, "upr"], col = "blue", lty = 2)
+legend("topleft", legend = c("Hombres", "Mujeres"), 
+       col = c("red", "blue"), lwd = 2)
