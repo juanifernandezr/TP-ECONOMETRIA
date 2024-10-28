@@ -1,0 +1,19 @@
+library(haven)
+library(AER)
+datos <- read_dta("C:/Users/julip/Desktop/Econometría/jtpa (1).dta")
+head(datos)
+ 
+#PUNTO 1
+datos2 <- datos [datos$earnings > 0, ] 
+reg1 <- lm (earnings ~ jtpa_training, data = datos2)
+summary(reg1)
+reg2 <- lm (log (datos2$earnings) ~ jtpa_training, data = datos2)
+summary (reg2)
+ 
+#PUNTO 2
+reg3 <- lm (log (datos2$earnings) ~  jtpa_training +  sex + I(jtpa_training * sex) + hsorged + black + hispanic + married + wkless13 + age2225 + age2629 + age3035 + age3644 + age4554, data = datos2)
+summary(reg3)
+ 
+#PUNTO 4
+iv <- ivreg(log(datos2$earnings) ~ jtpa_training + hsorged + black + hispanic + married + sex + wkless13 + age2225 + age2629 + age3035 + age3644 + age4554| . - jtpa_training + jtpa_offer, data = datos2)
+summary(iv)
